@@ -1,0 +1,40 @@
+body {
+    background-image: url("images/1.jpg");
+    background-size: cover;
+    background-position: center;
+    font-family: "Days One", sans-serif;
+    color: white;
+}
+
+.register-container {
+    background: rgba(0, 0, 0, 0.6);
+    max-width: 400px;
+    width: 100%;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 40px;
+    color: white;
+}
+
+.role-box label {
+    font-size: 16px;
+}
+
+.login-link {
+    font-size: 14px;
+    color: white;
+}
+
+.login-link a {
+    color: #00ff99;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}

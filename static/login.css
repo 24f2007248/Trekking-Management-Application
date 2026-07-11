@@ -1,0 +1,21 @@
+body {
+    background-image: url("images/1.jpg");
+    background-size: cover;
+    background-position: center;
+    font-family: "Days One", sans-serif;
+}
+
+.login-box {
+    background: rgba(0, 0, 0, 0.6);
+    max-width: 350px; /* Restricts the card width on large screens */
+    width: 100%;
+}
+
+.custom-link {
+    color: #00ff99;
+    transition: text-decoration 0.2s ease;
+}
+
+.custom-link:hover {
+    text-decoration: underline !important;
+}
