@@ -1,0 +1,78 @@
+{% macro render_light_table(headers, keys, data) %}
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle mb-0">
+
+            <thead class="table-light">
+                <tr>
+                    {% for header in headers %}
+                    <th {% if header in ['Action', 'Actions'] %}class="text-center"{% endif %}>
+                        {{ header }}
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for item in data %}
+                <tr>
+
+                    {% for key in keys %}
+                    <td {% if loop.first %}class="font-monospace"{% endif %}>
+
+                        {% if key == 'status' or key == 'approval_status' %}
+
+                            {% if item[key]|lower in ['open', 'approved', 'booked'] %}
+                                <span class="badge text-bg-success">
+                                    {{ item[key] }}
+                                </span>
+
+                            {% elif item[key]|lower in ['closed', 'blacklisted', 'cancelled', 'rejected'] %}
+                                <span class="badge text-bg-danger">
+                                    {{ item[key] }}
+                                </span>
+
+                            {% else %}
+                                <span class="badge text-bg-secondary">
+                                    {{ item[key] }}
+                                </span>
+                            {% endif %}
+
+                        {% elif key == 'actions' %}
+
+                            <div class="d-flex justify-content-center">
+                                {{ caller(item) }}
+                            </div>
+
+                        {% else %}
+
+                            {{ item[key] }}
+
+                        {% endif %}
+
+                    </td>
+                    {% endfor %}
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="{{ headers|length }}" class="text-center">
+                        No records found.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+{% endmacro %}

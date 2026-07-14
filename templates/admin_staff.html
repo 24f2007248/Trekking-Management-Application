@@ -1,0 +1,75 @@
+{% extends 'layout.html' %}
+{% from 'tables.html' import render_light_table %}
+
+{% block title %}Staff Requests | Trekking Management{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Staff Requests</h2>
+
+<div class="btn-group mb-4">
+
+    <a href="{{ url_for('admin_staff', tab='pending') }}"
+       class="btn {% if active_tab == 'pending' %}btn-primary{% else %}btn-outline-dark{% endif %}">
+        Pending ({{ counts.pending }})
+    </a>
+
+    <a href="{{ url_for('admin_staff', tab='approved') }}"
+       class="btn {% if active_tab == 'approved' %}btn-primary{% else %}btn-outline-dark{% endif %}">
+        Approved ({{ counts.approved }})
+    </a>
+
+    <a href="{{ url_for('admin_staff', tab='blacklisted') }}"
+       class="btn {% if active_tab == 'blacklisted' %}btn-primary{% else %}btn-outline-dark{% endif %}">
+        Blacklisted ({{ counts.blacklisted }})
+    </a>
+
+</div>
+
+{% call(member) render_light_table(
+    headers=['Staff ID', 'Name', 'Email', 'Contact', 'Status', 'Action'],
+    keys=['id', 'name', 'email', 'contact', 'status', 'actions'],
+    data=staff_members
+) %}
+
+    {% if active_tab == 'pending' %}
+
+        <form action="{{ url_for('update_staff_status', staff_id=member.raw_id, action='approve', origin=active_tab) }}"
+              method="POST"
+              class="d-inline">
+            <button class="btn btn-success btn-sm" type="submit">
+                Approve
+            </button>
+        </form>
+
+        <form action="{{ url_for('update_staff_status', staff_id=member.raw_id, action='reject', origin=active_tab) }}"
+              method="POST"
+              class="d-inline">
+            <button class="btn btn-danger btn-sm" type="submit">
+                Reject
+            </button>
+        </form>
+
+    {% elif active_tab == 'approved' %}
+
+        <form action="{{ url_for('update_staff_status', staff_id=member.raw_id, action='blacklist', origin=active_tab) }}"
+              method="POST">
+            <button class="btn btn-outline-danger btn-sm" type="submit">
+                Blacklist
+            </button>
+        </form>
+
+    {% else %}
+
+        <form action="{{ url_for('update_staff_status', staff_id=member.raw_id, action='approve', origin=active_tab) }}"
+              method="POST">
+            <button class="btn btn-outline-success btn-sm" type="submit">
+                Restore
+            </button>
+        </form>
+
+    {% endif %}
+
+{% endcall %}
+
+{% endblock %}

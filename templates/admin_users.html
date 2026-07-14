@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+{% from 'tables.html' import render_light_table %}
+
+{% block title %}Manage Users | Trekking Management{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Manage Users</h2>
+
+<form action="{{ url_for('admin_users') }}" method="GET" class="mb-4">
+    <div class="input-group">
+        <span class="input-group-text">
+            <i class="bi bi-search"></i>
+        </span>
+        <input
+            type="text"
+            name="search"
+            class="form-control"
+            placeholder="Search users by name, ID, or email..."
+            value="{{ search_query }}">
+    </div>
+</form>
+
+{% call(user) render_light_table(
+    headers=['User ID', 'Name', 'Email', 'Contact', 'Status', 'Actions'],
+    keys=['id', 'name', 'email', 'contact', 'status', 'actions'],
+    data=users_list
+) %}
+
+    {% if user.is_active %}
+        <form action="{{ url_for('toggle_user_status', user_id=user.raw_id) }}"
+              method="POST"
+              class="d-inline">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-person-x"></i> Deactivate
+            </button>
+        </form>
+    {% else %}
+        <form action="{{ url_for('toggle_user_status', user_id=user.raw_id) }}"
+              method="POST"
+              class="d-inline">
+            <button type="submit" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-person-check"></i> Activate
+            </button>
+        </form>
+    {% endif %}
+
+{% endcall %}
+
+{% if total_pages > 1 %}
+<nav class="d-flex justify-content-end mt-4">
+    <ul class="pagination pagination-sm">
+
+        <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('admin_users', page=current_page - 1, search=search_query) }}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        </li>
+
+        {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == current_page %}active{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('admin_users', page=p, search=search_query) }}">
+                {{ p }}
+            </a>
+        </li>
+        {% endfor %}
+
+        <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('admin_users', page=current_page + 1, search=search_query) }}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </li>
+
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

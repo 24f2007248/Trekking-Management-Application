@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+{% from 'tables.html' import render_light_table %}
+{% from 'stats.html' import render_stats_cards %}
+
+{% block title %}Dashboard | Trekking Management{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Dashboard</h2>
+
+{% set admin_stats = [
+    {
+        'title': 'Total Treks',
+        'value': stats.total_treks,
+        'bg_color': 'stat-card',
+        'icon': 'bi-mountains'
+    },
+    {
+        'title': 'Total Users',
+        'value': stats.total_users,
+        'bg_color': 'stat-card',
+        'icon': 'bi-person'
+    },
+    {
+        'title': 'Total Staff',
+        'value': stats.total_staff,
+        'bg_color': 'stat-card',
+        'icon': 'bi-people'
+    },
+    {
+        'title': 'Total Bookings',
+        'value': stats.total_bookings,
+        'bg_color': 'stat-card',
+        'icon': 'bi-calendar-check'
+    }
+] %}
+
+{{ render_stats_cards(admin_stats) }}
+
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+
+        <h4 class="mb-3">Recent Bookings</h4>
+
+        {% call(booking) render_light_table(
+            headers=['Booking ID', 'User', 'Trek', 'Booking Date', 'Status'],
+            keys=['id', 'user_name', 'trek_title', 'booking_date', 'status'],
+            data=bookings
+        ) %}
+        {% endcall %}
+
+        <div class="text-end mt-3">
+            <a href="{{ url_for('admin_booking') }}" class="text-decoration-none">
+                View All Bookings
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

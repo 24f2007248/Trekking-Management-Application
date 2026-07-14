@@ -1,0 +1,124 @@
+{% extends 'layout.html' %}
+{% from 'tables.html' import render_light_table %}
+
+{% block title %}Manage Treks | Trekking Management{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Treks</h2>
+
+    <a href="{{ url_for('add_trek') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Add New Trek
+    </a>
+</div>
+
+<form method="GET" action="{{ url_for('admin_treks') }}" class="mb-4">
+    <div class="row">
+
+        <div class="col-md-8 mb-3">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Search by trek name or location..."
+                    value="{{ search_query }}">
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <select
+                name="status"
+                class="form-select"
+                onchange="this.form.submit()">
+
+                <option value="All" {% if status_filter == 'All' %}selected{% endif %}>
+                    Status: All
+                </option>
+
+                <option value="Open" {% if status_filter == 'Open' %}selected{% endif %}>
+                    Open
+                </option>
+
+                <option value="Started" {% if status_filter == 'Started' %}selected{% endif %}>
+                    Started
+                </option>
+
+                <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>
+                    Completed
+                </option>
+
+                <option value="Closed" {% if status_filter == 'Closed' %}selected{% endif %}>
+                    Closed
+                </option>
+
+            </select>
+        </div>
+
+    </div>
+</form>
+
+{% call(trek) render_light_table(
+    headers=['ID', 'Trek Name', 'Location', 'Difficulty', 'Slots', 'Status', 'Actions'],
+    keys=['id', 'name', 'location', 'difficulty', 'slots', 'status', 'actions'],
+    data=treks
+) %}
+
+    <a href="{{ url_for('edit_trek', trek_id=trek.raw_id) }}"
+       class="btn btn-outline-secondary btn-sm"
+       title="Edit Trek">
+        <i class="bi bi-pencil"></i>
+    </a>
+
+    <form action="{{ url_for('delete_trek', trek_id=trek.raw_id) }}"
+          method="POST"
+          class="d-inline"
+          onsubmit="return confirm('Are you sure you want to delete this trek?');">
+
+        <button type="submit"
+                class="btn btn-outline-danger btn-sm"
+                title="Delete Trek">
+            <i class="bi bi-trash"></i>
+        </button>
+
+    </form>
+
+{% endcall %}
+
+{% if total_pages > 1 %}
+<nav class="d-flex justify-content-end mt-4">
+    <ul class="pagination pagination-sm">
+
+        <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('admin_treks', page=current_page-1, search=search_query, status=status_filter) }}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        </li>
+
+        {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == current_page %}active{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('admin_treks', page=p, search=search_query, status=status_filter) }}">
+                {{ p }}
+            </a>
+        </li>
+        {% endfor %}
+
+        <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('admin_treks', page=current_page+1, search=search_query, status=status_filter) }}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </li>
+
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

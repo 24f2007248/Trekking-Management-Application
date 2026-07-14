@@ -1,0 +1,12 @@
+body {
+    background-image: url("images/1.jpg");
+    background-size: cover;
+    background-position: center;
+    font-family: "Days One", sans-serif;
+    color: black;
+}
+
+.bg-dark-transparent {
+    background: rgba(33, 37, 41, 0.85);
+    backdrop-filter: blur(8px);
+}

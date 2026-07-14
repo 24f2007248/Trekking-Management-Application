@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+{% from 'tables.html' import render_light_table %}
+
+{% block title %}Bookings | Trekking Management{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Bookings</h2>
+</div>
+
+<form action="{{ url_for('admin_booking') }}" method="GET" class="mb-4">
+    <div class="input-group">
+        <span class="input-group-text">
+            <i class="bi bi-search"></i>
+        </span>
+        <input
+            type="text"
+            class="form-control"
+            name="search"
+            placeholder="Search by user or trek name..."
+            value="{{ search_query }}">
+    </div>
+</form>
+
+{% call(booking) render_light_table(
+    headers=['Booking ID', 'User Name', 'Trek Title', 'Booking Date', 'Status'],
+    keys=['id', 'user_name', 'trek_title', 'booking_date', 'status'],
+    data=bookings_list
+) %}
+{% endcall %}
+
+{% if total_pages > 1 %}
+<nav class="mt-4 d-flex justify-content-end">
+    <ul class="pagination pagination-sm">
+
+        <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('admin_bookings', page=current_page-1, search=search_query) }}">
+                &laquo;
+            </a>
+        </li>
+
+        {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == current_page %}active{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('admin_bookings', page=p, search=search_query) }}">
+                {{ p }}
+            </a>
+        </li>
+        {% endfor %}
+
+        <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('admin_bookings', page=current_page+1, search=search_query) }}">
+                &raquo;
+            </a>
+        </li>
+
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
