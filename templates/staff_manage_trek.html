@@ -1,0 +1,134 @@
+{% extends 'staff_layout.html' %}
+{% from 'tables.html' import render_light_table %}
+
+{% block title %}Manage Trek | {{ trek.trekname }}{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-0">{{ trek.trekname }}</h2>
+<p class="text-muted mb-4">Trek Overview and Management Control</p>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <h4 class="mb-4">Trek Information</h4>
+
+        <form action="{{ url_for('staff_update_trek_config', trek_id=trek.trekid) }}" method="POST">
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <p><strong>Location:</strong> {{ trek.location }}</p>
+                    <p><strong>Duration:</strong> {{ trek.duration }} Days</p>
+                    <p><strong>Start Date:</strong> {{ trek.start_date.strftime('%d %b %Y') }}</p>
+                    <p><strong>End Date:</strong> {{ trek.end_date.strftime('%d %b %Y') }}</p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <label for="available_slots" class="form-label">
+                            Available Slots
+                        </label>
+
+                        <input
+                            type="number"
+                            id="available_slots"
+                            name="available_slots"
+                            class="form-control"
+                            value="{{ trek.available_slots }}"
+                            min="0"
+                            max="{{ trek.total_slots }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">
+                            Status
+                        </label>
+
+                        <select
+                            id="status"
+                            name="status"
+                            class="form-select">
+
+                            <option value="Open"
+                                {% if trek.status=='Open' %}selected{% endif %}>
+                                Open
+                            </option>
+
+                            <option value="Closed"
+                                {% if trek.status=='Closed' %}selected{% endif %}>
+                                Closed
+                            </option>
+
+                            <option value="Started"
+                                {% if trek.status=='Started' %}selected{% endif %}>
+                                Started
+                            </option>
+
+                            <option value="Completed"
+                                {% if trek.status=='Completed' %}selected{% endif %}>
+                                Completed
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <button class="btn btn-dark" type="submit">
+                        Update Settings
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <h4 class="mb-3">
+            Participants ({{ participants|length }})
+        </h4>
+
+        {{ render_light_table(
+            headers=['User Name', 'Email', 'Booking Date', 'Status'],
+            keys=['user_name', 'email', 'booking_date', 'status'],
+            data=participants
+        ) }}
+
+    </div>
+</div>
+
+<div class="d-flex gap-2">
+
+    <form action="{{ url_for('staff_change_status', trek_id=trek.trekid, next_state='Started') }}"
+          method="POST">
+
+        <button
+            class="btn btn-outline-primary"
+            {% if trek.status in ['Started','Completed'] %}disabled{% endif %}>
+            Mark as Started
+        </button>
+
+    </form>
+
+    <form action="{{ url_for('staff_change_status', trek_id=trek.trekid, next_state='Completed') }}"
+          method="POST">
+
+        <button
+            class="btn btn-outline-success"
+            {% if trek.status!='Started' or trek.status=='Completed' %}disabled{% endif %}>
+            Mark as Completed
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

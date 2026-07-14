@@ -1,0 +1,86 @@
+{% extends 'staff_layout.html' %}
+{% from 'tables.html' import render_light_table %}
+
+{% block title %}Registered Participants | Trekking Management{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Participants</h2>
+
+<form action="{{ url_for('staff_participants') }}" method="GET" class="mb-4">
+
+    <div class="row">
+
+        <div class="col-md-5 mb-3">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Search by participant or trek..."
+                    value="{{ search_query }}">
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <select
+                name="status"
+                class="form-select"
+                onchange="this.form.submit()">
+
+                <option value="All"
+                    {% if status_filter == "All" %}selected{% endif %}>
+                    Status: All
+                </option>
+
+                <option value="Booked"
+                    {% if status_filter == "Booked" %}selected{% endif %}>
+                    Booked
+                </option>
+
+                <option value="Cancelled"
+                    {% if status_filter == "Cancelled" %}selected{% endif %}>
+                    Cancelled
+                </option>
+
+            </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <select
+                name="trek"
+                class="form-select"
+                onchange="this.form.submit()">
+
+                <option value="All"
+                    {% if trek_filter == "All" %}selected{% endif %}>
+                    All Treks
+                </option>
+
+                {% for trek in trek_list %}
+                <option
+                    value="{{ trek.trekid }}"
+                    {% if trek_filter == trek.trekid|string %}selected{% endif %}>
+                    {{ trek.trekname }}
+                </option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+    </div>
+
+</form>
+
+{% call(p) render_light_table(
+    headers=['User Name', 'Email', 'Phone', 'Assigned Trek', 'Booking Date', 'Status'],
+    keys=['user_name', 'email', 'phone', 'trek_title', 'booking_date', 'status'],
+    data=participants
+) %}
+{% endcall %}
+
+{% endblock %}

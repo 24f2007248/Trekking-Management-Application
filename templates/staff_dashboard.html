@@ -1,0 +1,43 @@
+{% extends 'staff_layout.html' %}
+{% from 'tables.html' import render_light_table %}
+{% from 'stats.html' import render_stats_cards %}
+
+{% block title %}Staff Dashboard | Trekking Management{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">My Dashboard</h2>
+
+{% set stats_data = [
+    {
+        'title': 'Assigned Treks',
+        'value': stats.assigned_treks,
+        'bg_color': 'text-primary',
+        'icon': 'bi-briefcase'
+    },
+    {
+        'title': 'Total Participants',
+        'value': stats.total_participants,
+        'bg_color': 'text-success',
+        'icon': 'bi-people'
+    },
+    {
+        'title': 'Open Treks',
+        'value': stats.open_treks,
+        'bg_color': 'text-warning',
+        'icon': 'bi-compass'
+    }
+] %}
+
+{{ render_stats_cards(stats_data) }}
+
+<h4 class="mb-3">My Assigned Treks</h4>
+
+{% call(trek) render_light_table(
+    headers=['Trek Name', 'Location', 'Participants', 'Slots', 'Status'],
+    keys=['name', 'location', 'participants', 'slots', 'status'],
+    data=assigned_treks_list
+) %}
+{% endcall %}
+
+{% endblock %}

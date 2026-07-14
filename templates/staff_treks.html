@@ -1,0 +1,92 @@
+{% extends 'staff_layout.html' %}
+{% from 'tables.html' import render_light_table %}
+
+{% block title %}My Assigned Treks | Trekking Management{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">My Treks</h2>
+
+<form action="{{ url_for('staff_treks') }}" method="GET" class="mb-4">
+
+    <div class="row">
+
+        <div class="col-md-8 mb-3">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Search assigned treks..."
+                    value="{{ search_query }}">
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <select
+                name="status"
+                class="form-select"
+                onchange="this.form.submit()">
+
+                <option value="All" {% if status_filter == "All" %}selected{% endif %}>Status: All</option>
+                <option value="Open" {% if status_filter == "Open" %}selected{% endif %}>Open</option>
+                <option value="Started" {% if status_filter == "Started" %}selected{% endif %}>Started</option>
+                <option value="Completed" {% if status_filter == "Completed" %}selected{% endif %}>Completed</option>
+                <option value="Closed" {% if status_filter == "Closed" %}selected{% endif %}>Closed</option>
+
+            </select>
+        </div>
+
+    </div>
+
+</form>
+
+{% call(trek) render_light_table(
+    headers=['Trek Name', 'Location', 'Difficulty', 'Slots', 'Status', 'Actions'],
+    keys=['name', 'location', 'difficulty', 'slots', 'status', 'actions'],
+    data=assigned_treks
+) %}
+
+    <a href="{{ url_for('staff_manage_trek', trek_id=trek.raw_id) }}"
+       class="btn btn-outline-primary btn-sm">
+        Manage
+    </a>
+
+{% endcall %}
+
+{% if total_pages > 1 %}
+<nav class="d-flex justify-content-end mt-4">
+    <ul class="pagination pagination-sm">
+
+        <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('staff_treks', page=current_page - 1, search=search_query, status=status_filter) }}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        </li>
+
+        {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == current_page %}active{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('staff_treks', page=p, search=search_query, status=status_filter) }}">
+                {{ p }}
+            </a>
+        </li>
+        {% endfor %}
+
+        <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('staff_treks', page=current_page + 1, search=search_query, status=status_filter) }}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </li>
+
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
