@@ -1,0 +1,93 @@
+{% extends 'user_layout.html' %}
+{% from 'tables.html' import render_light_table %}
+{% from 'stats.html' import render_stats_cards %}
+
+{% block title %}Dashboard | Trekking Management{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Welcome, {{ session.get('name') }}!</h2>
+
+{% set stats = [
+    {
+        'title': 'Available Treks',
+        'value': available_treks|length,
+        'bg_color': 'text-primary',
+        'icon': 'bi-tree-fill'
+    },
+    {
+        'title': 'My Bookings',
+        'value': my_bookings|length,
+        'bg_color': 'text-success',
+        'icon': 'bi-calendar-check'
+    },
+    {
+        'title': 'Completed Treks',
+        'value': completed_count,
+        'bg_color': 'text-warning',
+        'icon': 'bi-flag-fill'
+    }
+] %}
+
+{{ render_stats_cards(stats) }}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">Available Treks</h4>
+
+            <a href="{{ url_for('user_treks') }}"" class="btn btn-primary btn-sm">
+                Browse All
+            </a>
+        </div>
+
+        {% call(trek) render_light_table(
+            headers=['Trek Name','Location','Difficulty','Duration','Available Slots','Action'],
+            keys=['name','location','difficulty','duration','slots','actions'],
+            data=available_treks
+        ) %}
+
+            <a href="{{ url_for('book_trek', trek_id=trek.raw_id) }}"
+               class="btn btn-primary btn-sm">
+                Book Now
+            </a>
+
+        {% endcall %}
+
+    </div>
+</div>
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h4 class="mb-0">My Recent Bookings</h4>
+
+            <a href="{{ url_for('user_bookings') }}"
+               class="btn btn-outline-primary btn-sm">
+                View All
+            </a>
+
+        </div>
+
+        {% call(booking) render_light_table(
+            headers=['Trek Name','Booking Date','Status','Action'],
+            keys=['trek_name','booking_date','status','actions'],
+            data=my_bookings
+        ) %}
+
+            <a href="{{ url_for('book_trek', trek_id=booking.trek_id) }}"
+               class="btn btn-outline-secondary btn-sm">
+                View
+            </a>
+
+        {% endcall %}
+
+    </div>
+
+</div>
+
+{% endblock %}

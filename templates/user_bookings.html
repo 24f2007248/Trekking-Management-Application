@@ -1,0 +1,173 @@
+{% extends 'user_layout.html' %}
+{% from 'tables.html' import render_light_table %}
+
+{% block title %}
+{% if history %}
+History
+{% else %}
+My Bookings
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    {% if history %}
+        History
+    {% else %}
+        My Bookings
+    {% endif %}
+</h2>
+
+<form action="{{ url_for('user_bookings') }}" method="GET" class="mb-4">
+
+    <input type="hidden" name="history" value="{{ 'true' if history else 'false' }}">
+
+    <div class="row">
+
+        <div class="col-md-{% if history %}12{% else %}8{% endif %} mb-3">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Search by trek name or location..."
+                    value="{{ search_query }}">
+            </div>
+        </div>
+
+        {% if not history %}
+        <div class="col-md-4 mb-3">
+            <select
+                name="status"
+                class="form-select"
+                onchange="this.form.submit()">
+
+                <option value="All" {% if status_filter == "All" %}selected{% endif %}>
+                    Trek Status: All
+                </option>
+
+                <option value="Open" {% if status_filter == "Open" %}selected{% endif %}>
+                    Open
+                </option>
+
+                <option value="Started" {% if status_filter == "Started" %}selected{% endif %}>
+                    Started
+                </option>
+
+                <option value="Completed" {% if status_filter == "Completed" %}selected{% endif %}>
+                    Completed
+                </option>
+
+                <option value="Closed" {% if status_filter == "Closed" %}selected{% endif %}>
+                    Closed
+                </option>
+
+            </select>
+        </div>
+        {% endif %}
+
+    </div>
+
+</form>
+
+{% if history %}
+
+    {% call(booking) render_light_table(
+        headers=[
+            'Trek Name',
+            'Location',
+            'Booking Date',
+            'Trek Status',
+            'Booking Status'
+        ],
+        keys=[
+            'trek_name',
+            'location',
+            'booking_date',
+            'trek_status',
+            'booking_status'
+        ],
+        data=bookings
+    ) %}
+    {% endcall %}
+
+{% else %}
+
+    {% call(booking) render_light_table(
+        headers=[
+            'Trek Name',
+            'Location',
+            'Booking Date',
+            'Trek Status',
+            'Booking Status',
+            'Action'
+        ],
+        keys=[
+            'trek_name',
+            'location',
+            'booking_date',
+            'trek_status',
+            'booking_status',
+            'actions'
+        ],
+        data=bookings
+    ) %}
+
+        <a href="{{ url_for('book_trek', trek_id=booking.trek_id) }}"
+           class="btn btn-outline-primary btn-sm">
+            View Details
+        </a>
+
+    {% endcall %}
+
+{% endif %}
+
+{% if total_pages > 1 %}
+<nav class="d-flex justify-content-end mt-4">
+    <ul class="pagination pagination-sm">
+
+        <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('user_bookings',
+                                page=current_page-1,
+                                search=search_query,
+                                status=status_filter,
+                                history='true' if history else 'false') }}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        </li>
+
+        {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == current_page %}active{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('user_bookings',
+                                page=p,
+                                search=search_query,
+                                status=status_filter,
+                                history='true' if history else 'false') }}">
+                {{ p }}
+            </a>
+        </li>
+        {% endfor %}
+
+        <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+            <a class="page-link"
+               href="{{ url_for('user_bookings',
+                                page=current_page+1,
+                                search=search_query,
+                                status=status_filter,
+                                history='true' if history else 'false') }}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </li>
+
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
