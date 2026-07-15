@@ -293,11 +293,17 @@ def init_app_routes(app):
                     trekname=name,
                     location=location,
                     difficulty=difficulty,
-                    duration=int(duration) if duration else None,
-                    slots=int(slots) if slots else 0,
-                    status=status,
+                    duration=int(duration),
                     description=description,
-                    staff_id=int(staff_id) if staff_id else None # Maps to your model's staff relationship setup
+
+                    total_slots=int(slots),
+                    available_slots=int(slots),
+
+                    assigned_staff=int(staff_id),
+
+                    status=status,
+                    start_date=start_date,
+                    end_date=end_date
                 )
                 db.add(new_trek)
                 db.commit()
